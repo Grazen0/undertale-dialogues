@@ -6,7 +6,8 @@
 	"private": true,
 	"scripts": {
 		"start": "node ./dist/index.js",
-		"start:dev": "ts-node-dev --transpile-only --respawn --rs ./src/index.ts"
+		"start:dev": "ts-node-dev --transpile-only --respawn --rs ./src/index.ts",
+		"build": "tsc"
 	},
 	"dependencies": {
 		"canvas": "^2.6.1",
