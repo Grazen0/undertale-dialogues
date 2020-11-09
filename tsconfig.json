@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"target": "ES5",
+		"module": "CommonJS",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"removeComments": true,
+		"allowJs": true,
+		"noImplicitAny": true,
+		"outDir": "./dist"
+	},
+	"include": ["src"]
+}
