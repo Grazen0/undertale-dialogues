@@ -11,6 +11,7 @@ fs.readdirSync(FONTS).forEach(file =>
 );
 
 const app = express();
+app.set('json spaces', 2);
 app.use(cors());
 
 app.get('/:character', async (req, res) => {
@@ -46,8 +47,10 @@ app.get('/:character', async (req, res) => {
 	// Font style
 	ctx.textAlign = 'left';
 	ctx.textBaseline = 'top';
-	const fontSize = 32;
+	ctx.textDrawingMode = 'path';
+	ctx.fillStyle = 'white';
 
+	const fontSize = 32;
 	ctx.font = `${fontSize}px ${
 		character.toLowerCase() === 'sans'
 			? 'Comic Sans UT'
@@ -55,8 +58,6 @@ app.get('/:character', async (req, res) => {
 			? 'Papyrus UT'
 			: 'Determination Mono'
 	}`;
-	ctx.textDrawingMode = 'path';
-	ctx.fillStyle = 'white';
 
 	// Split dialog lines
 	const lines = dialog
@@ -82,7 +83,18 @@ app.get('/:character', async (req, res) => {
 });
 
 app.get('/', async (req, res) => {
-	res.status(200).json({ hello: 'world' });
+	const IMAGES = path.resolve('./assets/img/');
+	const folders = fs
+		.readdirSync(IMAGES)
+		.filter(folder => !/\.png$/i.test(folder));
+
+	const data = folders.reduce((acc, folder) => {
+		const images = fs.readdirSync(path.join(IMAGES, folder));
+		console.log(images);
+		return { ...acc, [folder]: images.map(img => img.replace(/\.png$/i, '')) };
+	}, {});
+
+	res.status(200).json(data);
 });
 
 const { PORT = 5000 } = process.env;
