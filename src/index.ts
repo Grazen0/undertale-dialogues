@@ -70,11 +70,13 @@ app.get('/:character', async (req, res) => {
 		.split('\n');
 	lines.length = Math.min(lines.length, 3);
 
+	// Draw text
 	ctx.fillText('*', 150, 30);
 	lines.forEach((line, index) =>
 		ctx.fillText(line, 180, 30 + index * (fontSize + 6))
 	);
 
+	// Send response
 	res.setHeader('Content-Type', 'image/png');
 	res.status(200).send(canvas.toBuffer());
 });
