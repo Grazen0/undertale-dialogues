@@ -13,22 +13,48 @@ fs.readdirSync(FONTS).forEach(file =>
 const app = express();
 app.use(cors());
 
-app.get('/', async (req, res) => {
-	const { dialog = 'hey bud, you should give some text' } = req.query;
+app.get('/:character', async (req, res) => {
+	const {
+		query: { dialog, mode = 'default' },
+		params: { character },
+	} = req;
+
+	if (!dialog)
+		return res.status(400).json({
+			status: 400,
+			message: 'Missing "dialog" query parameter in request.',
+		});
+
 	const bg = await loadImage('./assets/img/background.png');
+	const face = await loadImage(`./assets/img/${character}/${mode}.png`).catch(
+		() => null
+	);
+
+	if (!face)
+		return res.status(404).json({
+			status: 404,
+			message: 'Character mode not found.',
+		});
 
 	const { width, height } = bg;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
 	ctx.drawImage(bg, 0, 0, width, height);
-
-	ctx.textAlign = 'left';
-	ctx.textBaseline = 'top';
+	ctx.drawImage(face, 14, 14, 142, 142);
 
 	// Font style
+	ctx.textAlign = 'left';
+	ctx.textBaseline = 'top';
 	const fontSize = 32;
-	ctx.font = `${fontSize}px Comic Sans UT`;
+
+	ctx.font = `${fontSize}px ${
+		character.toLowerCase() === 'sans'
+			? 'Comic Sans UT'
+			: character === 'papyrus'
+			? 'Papyrus UT'
+			: 'Determination Mono'
+	}`;
 	ctx.textDrawingMode = 'path';
 	ctx.fillStyle = 'white';
 
@@ -37,20 +63,24 @@ app.get('/', async (req, res) => {
 		.toString()
 		.split(' ')
 		.reduce((acc, word) =>
-			`${acc} ${word}`.split('\n').slice(-1)[0].length < 22
+			ctx.measureText(`${acc} ${word}`.split('\n').slice(-1)[0]).width < 360
 				? `${acc} ${word}`
 				: `${acc}\n${word}`
 		)
 		.split('\n');
 	lines.length = Math.min(lines.length, 3);
 
-	ctx.fillText('*', 170, 30);
+	ctx.fillText('*', 150, 30);
 	lines.forEach((line, index) =>
-		ctx.fillText(line, 200, 30 + index * (fontSize + 6))
+		ctx.fillText(line, 180, 30 + index * (fontSize + 6))
 	);
 
 	res.setHeader('Content-Type', 'image/png');
 	res.status(200).send(canvas.toBuffer());
+});
+
+app.get('/', async (req, res) => {
+	res.status(200).json({ hello: 'world' });
 });
 
 const { PORT = 5000 } = process.env;
