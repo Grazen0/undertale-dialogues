@@ -82,7 +82,7 @@ app.get('/:character', async (req, res) => {
 	// Draw text
 	ctx.fillText('*', 142, 22);
 	lines.forEach((line, index) =>
-		ctx.fillText(line, 172, 22 + index * (fontSize + 6))
+		ctx.fillText(line.trim(), 172, 22 + index * (fontSize + 6))
 	);
 
 	// Send response
