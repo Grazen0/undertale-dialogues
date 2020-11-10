@@ -4,8 +4,8 @@
 <br />
 Generate Undertale dialogue boxes on the fly with a URL!
 
-[![sans][sans]]([sans] "Sans' dialogue")
-[![papyrus][papyrus]]([papyrus] "Papyrus' dialogue")
+![sans][sans]
+![papyrus][papyrus]
 
 [build]: https://github.com/ElCholoGamer/undertale-dialogues/workflows/Build/badge.svg
 [sans]: https://undertale-dialogues.herokuapp.com/sans?dialog=hey%20bud.%20want%20some%20hot%20dogs%3F&mode=wink
