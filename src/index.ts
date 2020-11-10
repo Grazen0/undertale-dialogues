@@ -14,43 +14,50 @@ const app = express();
 app.set('json spaces', 2);
 app.use(cors());
 
+// A character's dialogue
 app.get('/:character', async (req, res) => {
 	const {
 		query: { dialog, mode = 'default' },
 		params: { character },
 	} = req;
 
+	// Check if dialog was provided
 	if (!dialog)
 		return res.status(400).json({
 			status: 400,
 			message: 'Missing "dialog" query parameter in request.',
 		});
 
+	// Load images
 	const bg = await loadImage('./assets/img/background.png');
 	const face = await loadImage(`./assets/img/${character}/${mode}.png`).catch(
 		() => null
 	);
 
+	// Check if character face exists
 	if (!face)
 		return res.status(404).json({
 			status: 404,
-			message: 'Character mode not found.',
+			message: `Face mode "${mode}" for character "${character}" not found.`,
 		});
 
+	// Create canvas and draw images
 	const { width, height } = bg;
 	const canvas = createCanvas(width, height);
 	const ctx = canvas.getContext('2d');
 
+	ctx.imageSmoothingEnabled = false;
 	ctx.drawImage(bg, 0, 0, width, height);
-	ctx.drawImage(face, 14, 14, 142, 142);
+	ctx.drawImage(face, 6, 6, 142, 142);
 
 	// Font style
 	ctx.textAlign = 'left';
 	ctx.textBaseline = 'top';
 	ctx.textDrawingMode = 'path';
 	ctx.fillStyle = 'white';
-
 	const fontSize = 32;
+
+	// Select font family
 	ctx.font = `${fontSize}px ${
 		character.toLowerCase() === 'sans'
 			? 'Comic Sans UT'
@@ -62,6 +69,7 @@ app.get('/:character', async (req, res) => {
 	// Split dialog lines
 	const lines = dialog
 		.toString()
+		.trim()
 		.split(' ')
 		.reduce((acc, word) =>
 			ctx.measureText(`${acc} ${word}`.split('\n').slice(-1)[0]).width < 360
@@ -72,9 +80,9 @@ app.get('/:character', async (req, res) => {
 	lines.length = Math.min(lines.length, 3);
 
 	// Draw text
-	ctx.fillText('*', 150, 30);
+	ctx.fillText('*', 142, 22);
 	lines.forEach((line, index) =>
-		ctx.fillText(line, 180, 30 + index * (fontSize + 6))
+		ctx.fillText(line, 172, 22 + index * (fontSize + 6))
 	);
 
 	// Send response
@@ -82,17 +90,22 @@ app.get('/:character', async (req, res) => {
 	res.status(200).send(canvas.toBuffer());
 });
 
+// API index
 app.get('/', async (req, res) => {
 	const IMAGES = path.resolve('./assets/img/');
 	const folders = fs
 		.readdirSync(IMAGES)
 		.filter(folder => !/\.png$/i.test(folder));
 
-	const data = folders.reduce((acc, folder) => {
-		const images = fs.readdirSync(path.join(IMAGES, folder));
-		console.log(images);
-		return { ...acc, [folder]: images.map(img => img.replace(/\.png$/i, '')) };
-	}, {});
+	const data = folders.reduce(
+		(acc, folder) => ({
+			...acc,
+			[folder]: fs
+				.readdirSync(path.join(IMAGES, folder))
+				.map(img => img.replace(/\.png$/i, '')),
+		}),
+		{}
+	);
 
 	res.status(200).json(data);
 });
