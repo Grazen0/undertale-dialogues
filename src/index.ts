@@ -21,11 +21,14 @@ app.get('/:character', async (req, res) => {
 		params: { character },
 	} = req;
 
+	const text = dialog?.toString().trim().replace(/\s+/, ' ');
+
 	// Check if dialog was provided
-	if (!dialog)
+	if (!text?.length)
 		return res.status(400).json({
 			status: 400,
-			message: 'Missing "dialog" query parameter in request.',
+			message:
+				'Missing "dialog" query parameter in request, or invalid text provided.',
 		});
 
 	// Load images
@@ -67,12 +70,12 @@ app.get('/:character', async (req, res) => {
 	}`;
 
 	// Split dialog lines
-	const lines = dialog
+	const lines = text
 		.toString()
 		.trim()
 		.split(' ')
 		.reduce((acc, word) =>
-			ctx.measureText(`${acc} ${word}`.split('\n').slice(-1)[0]).width < 360
+			ctx.measureText(`${acc} ${word}`.split('\n').slice(-1)[0]).width < 370
 				? `${acc} ${word}`
 				: `${acc}\n${word}`
 		)
