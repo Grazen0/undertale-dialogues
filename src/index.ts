@@ -75,7 +75,7 @@ app.get('/:character', async (req, res) => {
 		.trim()
 		.split(' ')
 		.reduce((acc, word) =>
-			ctx.measureText(`${acc} ${word}`.split('\n').slice(-1)[0]).width < 370
+			ctx.measureText(acc.split('\n').slice(-1)[0]).width < 350
 				? `${acc} ${word}`
 				: `${acc}\n${word}`
 		)
