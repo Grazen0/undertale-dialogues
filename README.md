@@ -1,8 +1,8 @@
 # Undertale dialogues API
 
-Generate Undertale dialogue boxes on the fly with a URL!
-<br />
 ![build][build]
+<br />
+Generate Undertale dialogue boxes on the fly with a URL!
 
 ![sans][sans]
 ![papyrus][papyrus]
