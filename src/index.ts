@@ -24,7 +24,7 @@ app.get('/:character', async (req, res) => {
 	const text = dialog?.toString().trim().replace(/\s+/, ' ');
 
 	// Check if dialog was provided
-	if (!text?.length)
+	if (!text)
 		return res.status(400).json({
 			status: 400,
 			message:
@@ -74,10 +74,13 @@ app.get('/:character', async (req, res) => {
 		.toString()
 		.trim()
 		.split(' ')
-		.reduce((acc, word) =>
-			ctx.measureText(acc.split('\n').slice(-1)[0]).width < 350
-				? `${acc} ${word}`
-				: `${acc}\n${word}`
+		.reduce(
+			(acc, word) =>
+				acc +
+				(ctx.measureText(acc.split('\n').slice(-1)[0]).width < 280
+					? ' '
+					: '\n') +
+				word
 		)
 		.split('\n');
 	lines.length = Math.min(lines.length, 3);
